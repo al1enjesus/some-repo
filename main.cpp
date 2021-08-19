@@ -15,6 +15,16 @@ bool ConsistsOfDigits(const std::string &word)
     return false;
 }
 
+bool ConsistsOfUpperCase(const std::string &word)
+{
+    if (std::count_if(word.begin(), word.end(), [](const char &c){
+        return std::isupper(c);
+    }) == word.size()){
+        return true;
+    }
+    return false;
+}
+
 class CallBack
 {
 public:
@@ -159,7 +169,7 @@ int main(int argc, char *argv[]) {
     input_file.close();
 
 
-    auto predicate = ConsistsOfDigits;
+    auto predicate = ConsistsOfUpperCase;
     CallBack callback(predicate);
     // Connect with log file, if you want to write file into output file
     // if you'll commit the next line, you'll see banned words in console
