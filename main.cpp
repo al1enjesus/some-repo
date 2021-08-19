@@ -49,11 +49,30 @@ void PrepareFile(const std::string &file_name, Predicate predicate) {
     */
 
 
-    // Removing ban words
+    // region Removing ban words
     for (auto &line : lines)
     {
         line.erase(std::remove_if(line.begin(), line.end(), predicate), line.end());
     }
+    // endregion
+
+
+    // region Editing file
+    file.open(file_name, std::ios::out);
+    for (int i = 0; i < lines.size(); i++){
+        for (int j = 0; j < lines[i].size(); j++){
+            if (j == lines[i].size() - 1){
+                file << lines[i][j];
+            } else {
+                file << lines[i][j] << " ";
+            }
+        }
+        if (i != lines.size() - 1){
+            file << std::endl;
+        }
+    }
+    file.close();
+    // endregion
 }
 
 int main(int argc, char *argv[]) {
