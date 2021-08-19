@@ -28,11 +28,12 @@ bool ConsistsOfUpperCase(const std::string &word)
 class CallBack
 {
 public:
-    explicit CallBack(std::function<bool(const std::string &word)> func){
-        inner_function = std::move(func);
+    CallBack() = default;
+    explicit CallBack(std::function<bool(const std::string &word)> predicate){
+        predicates.emplace_back(std::move(predicate));
     }
-    void ConnectWithFunc(std::function<bool(const std::string &word)> func){
-        inner_function = std::move(func);
+    void ConnectWithFunc(std::function<bool(const std::string &word)> predicate){
+        predicates.emplace_back(std::move(predicate));
     }
     void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"))
     {
@@ -45,7 +46,8 @@ public:
     }
     bool operator()(const std::string &word)
     {
-        if (inner_function(word)){
+        if (std::any_of(predicates.begin(), predicates.end(), [&word](auto predicate){return predicate(word);}))
+        {
             CallBackHandler(word);
             return true;
         }
@@ -73,7 +75,7 @@ public:
 
     }
 private:
-    std::function<bool(const std::string &word)> inner_function;
+    std::vector<std::function<bool(const std::string &word)>> predicates;
     bool is_connected_with_file = false;
     std::ofstream *log_file = new std::ofstream();
     std::vector<std::string> banned_words{};
@@ -124,6 +126,14 @@ void PrepareFile(const std::string &file_name, Predicate predicate, CallBack cal
 
 
     // region Removing ban words
+
+    // Connect our CallBack with predicate
+    callback.ConnectWithFunc(predicate);
+
+    // If you want to use more than 1 predicate just add
+    // example at the next line
+    // callback.ConnectWithFunc(ConsistsOfUpperCase);
+
     for (auto &line : lines)
     {
         // std::bind helps avoid CallBack's copy constructor
@@ -169,12 +179,11 @@ int main(int argc, char *argv[]) {
     input_file.close();
 
 
-    auto predicate = ConsistsOfUpperCase;
-    CallBack callback(predicate);
+    CallBack callback;
     // Connect with log file, if you want to write file into output file
     // if you'll commit the next line, you'll see banned words in console
     callback.ConnectWithLogFile();
-    PrepareFile(file_name, predicate, callback);
+    PrepareFile(file_name, ConsistsOfDigits, callback);
 
     std::cout << "The program worked correctly." << std::endl;
     return 0;
