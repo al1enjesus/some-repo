@@ -1,5 +1,16 @@
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+
+bool ConsistsOfDigits(const std::string &word)
+{
+    if (std::count_if(word.begin(), word.end(), [](const char &c){
+        return std::isdigit(c);
+    }) == word.size()) {
+        return true;
+    }
+    return false;
+}
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -17,7 +28,7 @@ int main(int argc, char *argv[]) {
     }
     std::cout << "Input file opened correctly." << std::endl;
     input_file.close();
-    
+
     std::cout << "The program worked correctly." << std::endl;
     return 0;
 }
