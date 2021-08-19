@@ -26,6 +26,9 @@ public:
     }
     void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"))
     {
+        if ((*log_file).is_open()){
+            (*log_file).close();
+        }
         (*log_file).open(filename, std::ios::out);
         (*log_file) << "Banned words: ";
         is_connected_with_file = true;
