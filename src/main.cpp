@@ -32,7 +32,7 @@ public:
     explicit CallBack(std::function<bool(const std::string &word)> predicate){
         predicates.emplace_back(std::move(predicate));
     }
-    void ConnectWithFunc(std::function<bool(const std::string &word)> predicate){
+    void ConnectWithPredicate(std::function<bool(const std::string &word)> predicate){
         predicates.emplace_back(std::move(predicate));
     }
     void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"))
@@ -128,11 +128,11 @@ void PrepareFile(const std::string &file_name, Predicate predicate, CallBack cal
     // region Removing ban words
 
     // Connect our CallBack with predicate
-    callback.ConnectWithFunc(predicate);
+    callback.ConnectWithPredicate(predicate);
 
     // If you want to use more than 1 predicate just add
     // example at the next line
-    // callback.ConnectWithFunc(ConsistsOfUpperCase);
+    // callback.ConnectWithPredicate(ConsistsOfUpperCase);
 
     for (auto &line : lines)
     {
