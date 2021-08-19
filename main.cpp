@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <regex>
+#include <functional>
 
 bool ConsistsOfDigits(const std::string &word)
 {
@@ -14,8 +15,68 @@ bool ConsistsOfDigits(const std::string &word)
     return false;
 }
 
-template <typename Predicate>
-void PrepareFile(const std::string &file_name, Predicate predicate) {
+class CallBack
+{
+public:
+    explicit CallBack(std::function<bool(const std::string &word)> func){
+        inner_function = std::move(func);
+    }
+    void ConnectWithFunc(std::function<bool(const std::string &word)> func){
+        inner_function = std::move(func);
+    }
+    void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"))
+    {
+        (*log_file).open(filename, std::ios::out);
+        (*log_file) << "Banned words: ";
+        is_connected_with_file = true;
+    }
+    bool operator()(const std::string &word)
+    {
+        if (inner_function(word)){
+            CallBackHandler(word);
+            return true;
+        }
+        return false;
+    };
+
+    ~CallBack(){
+        (*log_file).close();
+        delete log_file;
+        if (!is_connected_with_file){
+            this->PrintBannedWords();
+        }
+    }
+
+    void PrintBannedWords(){
+        if (!banned_words.empty()) {
+            std::cout << "Banned words: ";
+            for (auto &word: banned_words) {
+                std::cout << word << " ";
+            }
+            std::cout << std::endl;
+        } else {
+            std::cout << "There aren't banned words." << std::endl;
+        }
+
+    }
+private:
+    std::function<bool(const std::string &word)> inner_function;
+    bool is_connected_with_file = false;
+    std::ofstream *log_file = new std::ofstream();
+    std::vector<std::string> banned_words{};
+
+    void CallBackHandler(const std::string &word){
+        // Flagging handler
+        if (is_connected_with_file){
+            *log_file << word << " ";
+        } else {
+            banned_words.emplace_back(word);
+        }
+    }
+};
+
+template <typename Predicate, typename CallBack>
+void PrepareFile(const std::string &file_name, Predicate predicate, CallBack callback) {
     // region Splitting file into words with regex and save them into "lines"
     std::fstream file(file_name, std::ios::in);
     std::vector<std::vector<std::string>> lines;
@@ -52,7 +113,9 @@ void PrepareFile(const std::string &file_name, Predicate predicate) {
     // region Removing ban words
     for (auto &line : lines)
     {
-        line.erase(std::remove_if(line.begin(), line.end(), predicate), line.end());
+        // std::bind helps avoid CallBack's copy constructor
+        line.erase(std::remove_if(line.begin(), line.end(), std::bind(std::ref(callback), std::placeholders::_1)),
+                   line.end());
     }
     // endregion
 
@@ -92,7 +155,13 @@ int main(int argc, char *argv[]) {
     std::cout << "Input file opened correctly." << std::endl;
     input_file.close();
 
-    PrepareFile(file_name, ConsistsOfDigits);
+
+    auto predicate = ConsistsOfDigits;
+    CallBack callback(predicate);
+    // Connect with log file, if you want to write file into output file
+    // if you'll commit the next line, you'll see banned words in console
+    callback.ConnectWithLogFile();
+    PrepareFile(file_name, predicate, callback);
 
     std::cout << "The program worked correctly." << std::endl;
     return 0;
