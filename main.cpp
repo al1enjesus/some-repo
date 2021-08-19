@@ -38,6 +38,22 @@ void PrepareFile(const std::string &file_name, Predicate predicate) {
     }
     file.close();
     // endregion
+
+
+    // Easy way with std::partition for divide banwords and whitewords
+    /*
+        auto newEnd = std::partition(line.begin(), line.end(), predicate);
+        for (auto it = newEnd; it != line.end(); ++it){
+            std::cout << *it << " ";
+        }
+    */
+
+
+    // Removing ban words
+    for (auto &line : lines)
+    {
+        line.erase(std::remove_if(line.begin(), line.end(), predicate), line.end());
+    }
 }
 
 int main(int argc, char *argv[]) {
