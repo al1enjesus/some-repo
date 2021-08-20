@@ -76,3 +76,7 @@ fabric.properties
 
 # Google tests
 /lib/googletest/
+/src/lib/
+
+# Idea
+/src/.idea/

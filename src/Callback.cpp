@@ -11,7 +11,9 @@ Callback::Callback(std::function<bool(const std::string &word)> predicate){
 }
 
 Callback::~Callback(){
-  (*log_file).close();
+  if (is_connected_with_file) {
+    (*log_file).close();
+  }
   delete log_file;
 }
 
