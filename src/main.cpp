@@ -54,7 +54,6 @@ void PrepareFile(const string &file_name, Predicate predicate, Callback &callbac
   vector<vector<string>> lines;
   SplitIntoWords(file_name, lines);
 
-  // region Removing ban words
 
   // Connect our CallBack with predicate
   callback.ConnectWithPredicate(predicate);
@@ -63,6 +62,7 @@ void PrepareFile(const string &file_name, Predicate predicate, Callback &callbac
   // example at the next line
   // callback.ConnectWithPredicate(ConsistsOfUpperCase);
 
+  // region Removing ban words
   for (auto &line : lines)
   {
     // bind helps avoid CallBack's copy constructor
