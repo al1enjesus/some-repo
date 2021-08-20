@@ -7,7 +7,7 @@
 
 #include <functional>
 #include <fstream>
-
+#include <vector>
 
 class Callback {
  public:
@@ -16,8 +16,8 @@ class Callback {
   ~Callback();
 
   void ConnectWithPredicate(std::function<bool(const std::string &word)> predicate);
-  [[maybe_unused]] void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"));
-  [[maybe_unused]] int GetCountPredicates();
+  void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"));
+  int GetCountPredicates();
   bool operator()(const std::string &word);
 
  private:

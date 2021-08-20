@@ -4,41 +4,43 @@
 #include <vector>
 #include <regex>
 #include <functional>
-#include <Callback.h>
+#include "Callback.h"
 
-[[maybe_unused]] bool ConsistsOfDigits(const std::string &word)
+using namespace std;
+
+[[maybe_unused]] bool ConsistsOfDigits(const string &word)
 {
-  if (std::count_if(word.begin(), word.end(), [](const char &c){return std::isdigit(c);})
+  if (count_if(word.begin(), word.end(), [](const char &c){return isdigit(c);})
       == word.size()){
     return true;
   }
   return false;
 }
 
-[[maybe_unused]] bool ConsistsOfUpperCase(const std::string &word)
+[[maybe_unused]] bool ConsistsOfUpperCase(const string &word)
 {
-  if (std::count_if(word.begin(), word.end(), [](const char &c){return std::isupper(c);})
+  if (count_if(word.begin(), word.end(), [](const char &c){return isupper(c);})
       == word.size()){
     return true;
   }
   return false;
 }
 
-template <typename Predicate, typename Callback>
-void PrepareFile(const std::string &file_name, Predicate predicate, Callback callback) {
+template <typename Predicate>
+void PrepareFile(const string &file_name, Predicate predicate, Callback callback) {
   // region Splitting file into words with regex and save them into "lines"
-  std::fstream file(file_name, std::ios::in);
-  std::vector<std::vector<std::string>> lines;
-  std::string row;
-  while (std::getline(file, row)) {
+  fstream file(file_name, ios::in);
+  vector<vector<string>> lines;
+  string row;
+  while (getline(file, row)) {
     // Splitting with regular expression
-    std::cmatch result;
+    cmatch result;
     // There may be more separators here.
-    std::regex pattern(R"(,|\.|!|\?|\s+)");
-    std::sregex_token_iterator iter(row.begin(), row.end(), pattern, -1);
-    std::sregex_token_iterator end;
+    regex pattern(R"(,|\.|!|\?|\s+)");
+    sregex_token_iterator iter(row.begin(), row.end(), pattern, -1);
+    sregex_token_iterator end;
 
-    std::vector<std::string> words_in_line;
+    vector<string> words_in_line;
     for (; iter != end; iter++) {
       if (iter->length()) {
         words_in_line.push_back(*iter);
@@ -60,15 +62,15 @@ void PrepareFile(const std::string &file_name, Predicate predicate, Callback cal
 
   for (auto &line : lines)
   {
-    // std::bind helps avoid CallBack's copy constructor
-    line.erase(std::remove_if(line.begin(), line.end(), std::bind(std::ref(callback), std::placeholders::_1)),
+    // bind helps avoid CallBack's copy constructor
+    line.erase(remove_if(line.begin(), line.end(), bind(ref(callback), placeholders::_1)),
                line.end());
   }
   // endregion
 
 
   // region Editing file
-  file.open(file_name, std::ios::out);
+  file.open(file_name, ios::out);
   for (int i = 0; i < lines.size(); i++){
     for (int j = 0; j < lines[i].size(); j++){
       if (j == lines[i].size() - 1){
@@ -78,7 +80,7 @@ void PrepareFile(const std::string &file_name, Predicate predicate, Callback cal
       }
     }
     if (i != lines.size() - 1){
-      file << std::endl;
+      file << endl;
     }
   }
   file.close();
@@ -86,20 +88,20 @@ void PrepareFile(const std::string &file_name, Predicate predicate, Callback cal
 }
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    std::cout << "Incorrect input." << std::endl;
-    return 0;
+  if (argc != 2) {
+    cout << "Incorrect input." << endl;
+    return 1;
   }
-  std::string file_name = argv[1];
-  std::cout << "Recognized file name: " << file_name << std::endl;
+  string file_name = argv[1];
+  cout << "Recognized file name: " << file_name << endl;
 
-  std::fstream input_file;
-  input_file.open(file_name, std::ios::in);
+  fstream input_file;
+  input_file.open(file_name, ios::in);
   if (!input_file){
-    std::cout << "Error with opening file." << std::endl;
-    return 0;
+    cout << "Error with opening file." << endl;
+    return 1;
   }
-  std::cout << "Input file opened correctly." << std::endl;
+  cout << "Input file opened correctly." << endl;
   input_file.close();
 
 
@@ -109,6 +111,6 @@ int main(int argc, char *argv[]) {
   callback.ConnectWithLogFile();
   PrepareFile(file_name, ConsistsOfDigits, callback);
 
-  std::cout << "The program worked correctly." << std::endl;
+  cout << "The program worked correctly." << endl;
   return 0;
 }

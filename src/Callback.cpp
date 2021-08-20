@@ -4,6 +4,7 @@
 
 #include "Callback.h"
 #include <iostream>
+#include <algorithm>
 
 Callback::Callback(std::function<bool(const std::string &word)> predicate){
   predicates.emplace_back(std::move(predicate));
@@ -18,7 +19,7 @@ void Callback::ConnectWithPredicate(std::function<bool(const std::string &word)>
   predicates.emplace_back(std::move(predicate));
 }
 
-[[maybe_unused]] void Callback::ConnectWithLogFile(const std::string &filename)
+void Callback::ConnectWithLogFile(const std::string &filename)
 {
   if ((*log_file).is_open()){
     (*log_file).close();
@@ -27,7 +28,7 @@ void Callback::ConnectWithPredicate(std::function<bool(const std::string &word)>
   is_connected_with_file = true;
 }
 
-[[maybe_unused]] int Callback::GetCountPredicates() {
+int Callback::GetCountPredicates() {
   return predicates.size();
 }
 
