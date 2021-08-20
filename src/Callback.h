@@ -12,19 +12,18 @@
 class Callback {
  public:
   Callback() = default;
-  [[maybe_unused]] explicit Callback(std::function<bool(const std::string &word)> predicate);
+  explicit Callback(std::function<bool(const std::string &word)> predicate);
   ~Callback();
 
   void ConnectWithPredicate(std::function<bool(const std::string &word)> predicate);
-  void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"));
-  void PrintBannedWords();
+  [[maybe_unused]] void ConnectWithLogFile(const std::string &filename=(std::string)("log.txt"));
+  [[maybe_unused]] int GetCountPredicates();
   bool operator()(const std::string &word);
 
  private:
   std::vector<std::function<bool(const std::string &word)>> predicates;
   bool is_connected_with_file = false;
   std::ofstream *log_file = new std::ofstream();
-  std::vector<std::string> banned_words{};
   void CallbackHandler(const std::string &word);
 };
 
